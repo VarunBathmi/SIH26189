@@ -1,0 +1,296 @@
+{
+  "schema_version": "1.0",
+  "dataset_type": "synthetic_investigation_case",
+  "case": {
+    "case_id": "CASE-2026-JAIPUR-014",
+    "note": "Suspected financial fraud + smuggling ring — synthetic demo case for SIH26189",
+    "source_file": "sample-investigation-case.json"
+  },
+  "people": [
+    {
+      "case_id": "CASE-2026-JAIPUR-014",
+      "person_id": "P501",
+      "name": "Arjun Malhotra",
+      "phone": "9811023456",
+      "device_id": "DEV-A501",
+      "ip": "182.156.23.11"
+    },
+    {
+      "case_id": "CASE-2026-JAIPUR-014",
+      "person_id": "P502",
+      "name": "Arjun Malhotra Jr",
+      "phone": "9811023457",
+      "device_id": "DEV-A502",
+      "ip": "182.156.23.12"
+    },
+    {
+      "case_id": "CASE-2026-JAIPUR-014",
+      "person_id": "P503",
+      "name": "Rekha Sharma",
+      "phone": "9922034567",
+      "device_id": "DEV-A503",
+      "ip": "103.45.67.89"
+    },
+    {
+      "case_id": "CASE-2026-JAIPUR-014",
+      "person_id": "P504",
+      "name": "Farhan Sheikh",
+      "phone": "9733045678",
+      "device_id": "DEV-A504",
+      "ip": "117.98.12.45"
+    },
+    {
+      "case_id": "CASE-2026-JAIPUR-014",
+      "person_id": "P505",
+      "name": "Priya Nair",
+      "phone": "9644056789",
+      "device_id": "DEV-A505",
+      "ip": "49.36.78.90"
+    },
+    {
+      "case_id": "CASE-2026-JAIPUR-014",
+      "person_id": "P506",
+      "name": "Vikram Oberoi",
+      "phone": "9855067890",
+      "device_id": "DEV-A506",
+      "ip": "223.176.5.34"
+    }
+  ],
+  "calls": [
+    {
+      "record_type": "call",
+      "record_id": "CALL-9001",
+      "caller_id": "P501",
+      "callee_id": "P503",
+      "duration_sec": 1420,
+      "timestamp": "2026-09-01T23:45:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "call",
+      "record_id": "CALL-9002",
+      "caller_id": "P503",
+      "callee_id": "P501",
+      "duration_sec": 980,
+      "timestamp": "2026-09-02T00:10:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "call",
+      "record_id": "CALL-9003",
+      "caller_id": "P501",
+      "callee_id": "P503",
+      "duration_sec": 1105,
+      "timestamp": "2026-09-02T23:55:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "call",
+      "record_id": "CALL-9004",
+      "caller_id": "P503",
+      "callee_id": "P504",
+      "duration_sec": 210,
+      "timestamp": "2026-09-03T11:20:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "call",
+      "record_id": "CALL-9005",
+      "caller_id": "P504",
+      "callee_id": "P505",
+      "duration_sec": 95,
+      "timestamp": "2026-09-03T14:05:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "call",
+      "record_id": "CALL-9006",
+      "caller_id": "P505",
+      "callee_id": "P506",
+      "duration_sec": 340,
+      "timestamp": "2026-09-04T09:30:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "call",
+      "record_id": "CALL-9007",
+      "caller_id": "P501",
+      "callee_id": "P503",
+      "duration_sec": 1560,
+      "timestamp": "2026-09-04T22:40:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    }
+  ],
+  "chats": [
+    {
+      "record_type": "chat",
+      "record_id": "CHAT-7001",
+      "sender_id": "P503",
+      "receiver_id": "P504",
+      "platform": "WhatsApp",
+      "timestamp": "2026-09-03T11:25:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "chat",
+      "record_id": "CHAT-7002",
+      "sender_id": "P504",
+      "receiver_id": "P505",
+      "platform": "Telegram",
+      "timestamp": "2026-09-03T14:10:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "chat",
+      "record_id": "CHAT-7003",
+      "sender_id": "P501",
+      "receiver_id": "P502",
+      "platform": "WhatsApp",
+      "timestamp": "2026-09-05T08:00:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    }
+  ],
+  "file_artifacts": [
+    {
+      "record_type": "file_artifact",
+      "record_id": "FILE-5001",
+      "owner_id": "P503",
+      "device_id": "DEV-A503",
+      "filename": "shipment_manifest_sept.pdf",
+      "hash_sha256": "7a3f5c9e1d2b4a6f8c0e3d5b7a9f1c3e5d7b9a1c3e5f7a9b1d3f5a7c9e1b3d5f",
+      "timestamp": "2026-09-03T15:00:00",
+      "transferred_to_id": "P505",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "file_artifact",
+      "record_id": "FILE-5002",
+      "owner_id": "P505",
+      "device_id": "DEV-A505",
+      "filename": "payment_confirmation.jpg",
+      "hash_sha256": "b1c3e5f7a9d1b3c5e7f9a1d3b5c7e9f1a3d5b7c9e1f3a5d7b9c1e3f5a7d9b1c3",
+      "timestamp": "2026-09-04T10:15:00",
+      "transferred_to_id": "P506",
+      "case_id": "CASE-2026-JAIPUR-014"
+    }
+  ],
+  "location_pings": [
+    {
+      "record_type": "location_ping",
+      "record_id": "LOC-3001",
+      "entity_id": "P503",
+      "device_id": "DEV-A503",
+      "lat": 26.9124,
+      "lng": 75.7873,
+      "timestamp": "2026-09-03T15:00:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "location_ping",
+      "record_id": "LOC-3002",
+      "entity_id": "P504",
+      "device_id": "DEV-A504",
+      "lat": 26.913,
+      "lng": 75.788,
+      "timestamp": "2026-09-03T15:12:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "location_ping",
+      "record_id": "LOC-3003",
+      "entity_id": "P505",
+      "device_id": "DEV-A505",
+      "lat": 26.9118,
+      "lng": 75.7866,
+      "timestamp": "2026-09-03T15:20:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "location_ping",
+      "record_id": "LOC-3004",
+      "entity_id": "P506",
+      "device_id": "DEV-A506",
+      "lat": 12.9716,
+      "lng": 77.5946,
+      "timestamp": "2026-09-04T09:00:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "location_ping",
+      "record_id": "LOC-3005",
+      "entity_id": "P505",
+      "device_id": "DEV-A505",
+      "lat": 12.972,
+      "lng": 77.595,
+      "timestamp": "2026-09-04T09:10:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    }
+  ],
+  "browser_history": [
+    {
+      "record_type": "browser_history",
+      "record_id": "WEB-2001",
+      "entity_id": "P503",
+      "url": "https://freightforwarders-example.net/track?awb=778812345",
+      "timestamp": "2026-09-02T21:00:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "record_type": "browser_history",
+      "record_id": "WEB-2002",
+      "entity_id": "P501",
+      "url": "https://offshorebanking-example.com/login",
+      "timestamp": "2026-09-01T22:30:00",
+      "case_id": "CASE-2026-JAIPUR-014"
+    }
+  ],
+  "transactions": [
+    {
+      "transaction_id": "TXN-8001",
+      "sender_id": "P501",
+      "receiver_id": "P505",
+      "amount": 950000,
+      "currency": "INR",
+      "timestamp": "2026-09-01T18:00:00",
+      "channel": "NEFT",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "transaction_id": "TXN-8002",
+      "sender_id": "P501",
+      "receiver_id": "P505",
+      "amount": 480000,
+      "currency": "INR",
+      "timestamp": "2026-09-02T09:30:00",
+      "channel": "NEFT",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "transaction_id": "TXN-8003",
+      "sender_id": "P501",
+      "receiver_id": "P505",
+      "amount": 470000,
+      "currency": "INR",
+      "timestamp": "2026-09-02T09:45:00",
+      "channel": "NEFT",
+      "case_id": "CASE-2026-JAIPUR-014"
+    },
+    {
+      "transaction_id": "TXN-8004",
+      "sender_id": "P505",
+      "receiver_id": "P506",
+      "amount": 1800000,
+      "currency": "INR",
+      "timestamp": "2026-09-04T11:00:00",
+      "channel": "RTGS",
+      "case_id": "CASE-2026-JAIPUR-014"
+    }
+  ],
+  "fir_reports": [
+    {
+      "case_id": "CASE-2026-JAIPUR-014",
+      "fir_id": "FIR-CASE-2026-JAIPUR-014",
+      "text": "On 02-09-2026, a complaint was filed at Jaipur Central Police Station regarding suspected smuggling activity coordinated by Arjun Malhotra, operating from Jaipur, in contact with Rekha Sharma who is believed to be liaising with Farhan Sheikh for logistics arranged near Malviya Nagar. Priya Nair and Vikram Oberoi were separately named in connection with payment transfers routed through a shell account. Investigators noted repeated late-night calls between Arjun Malhotra and Rekha Sharma exceeding 15 minutes in duration on multiple occasions."
+    }
+  ]
+}
