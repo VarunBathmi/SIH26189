@@ -46,7 +46,7 @@ def create_reveal_request(
         requester_role=requester_role,
         reason=reason,
         status=RevealStatus.PENDING.value,
-        created_at=datetime.datetime.utcnow()
+        created_at=datetime.datetime.now(datetime.timezone.utc)
     )
 
     db.add(req)
@@ -93,7 +93,7 @@ def approve_reveal_request(
             detail="Dual-authorization violation: Requester cannot approve their own reveal request."
         )
 
-    now_dt = datetime.datetime.utcnow()
+    now_dt = datetime.datetime.now(datetime.timezone.utc)
 
     # Record role approval
     if approver_role == UserRole.ADMINISTRATOR.value:

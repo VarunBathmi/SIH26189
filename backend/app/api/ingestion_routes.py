@@ -2,7 +2,7 @@ import uuid
 import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, Form, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -15,10 +15,12 @@ from app.models import (
 from app.security.auth import require_role
 from app.security.encryption import encrypt_name, generate_hash_id
 from app.security.custody import log_custody_action
-from app.nlp.entity_extractor import extract_entities
+from app.nlp.entity_extractor import extract_entities, extract_entities_detailed
 from app.nlp.event_extractor import extract_events_from_text
 from app.nlp.relation_extractor import extract_relationships
 from app.nlp.call_detection import detect_suspicious_calls
+from app.nlp.person_matching import resolve_case_identities
+from app.nlp.text_extractor import extract_document_text
 from app.financial.transaction_detection import detect_suspicious_transactions
 from app.alerts.workflow import create_alert
 from app.graph.build_graph import write_graph
@@ -34,6 +36,81 @@ class ReportPayload(BaseModel):
     document_type: str = DocumentType.FIR.value
     text: str
     case_id: str
+
+class TextAnalysisPayload(BaseModel):
+    text: str
+    case_id: Optional[str] = "CASE-PREVIEW"
+    document_id: Optional[str] = "PREVIEW-DOC"
+
+@router.post("/analyze-text", summary="Interactive NLP analysis of unstructured FIR narrative with entities, events, relationships, and person matching")
+def analyze_unstructured_text(
+    payload: TextAnalysisPayload,
+    current_user: dict = Depends(require_role([UserRole.INVESTIGATOR, UserRole.ADMINISTRATOR, UserRole.VIEWER]))
+):
+    """
+    Perform on-demand NLP analysis on raw FIR / investigation narrative text:
+    - Extracts standardized entities (PERSON, LOCATION, ORG, PHONE, EMAIL, IP_ADDRESS, VEHICLE, etc.)
+    - Extracts events (CALL, TRANSACTION, MEETING, COMMUNICATION, LOCATION_PRESENCE)
+    - Extracts precision relationships with provenance & confidence
+    - Detects possible person identity matches requiring investigator review
+    - Returns structured analytical leads without modifying database records
+    """
+    raw_text = payload.text.strip()
+    if not raw_text:
+        raise HTTPException(status_code=400, detail="Text cannot be empty.")
+
+    case_id = (payload.case_id or "CASE-PREVIEW").strip()
+    doc_id = (payload.document_id or "PREVIEW-DOC").strip()
+
+    # 1. Standardized entity extraction
+    entities = extract_entities(raw_text)
+    detailed_entities = extract_entities_detailed(raw_text, case_id=case_id, source_document=doc_id)
+
+    # 2. Event extraction
+    events = extract_events_from_text(raw_text)
+
+    # 3. Precision relationship extraction
+    relationships = extract_relationships(
+        entities=entities,
+        events=events,
+        case_id=case_id,
+        document_id=doc_id,
+        raw_text=raw_text
+    )
+
+    # 4. Candidate person identity resolution
+    candidate_person_matches = resolve_case_identities(
+        persons=entities.get("PERSON", []),
+        case_id=case_id
+    )
+
+    total_entities_count = sum(len(v) for v in entities.values())
+    total_events_count = (
+        len(events.get("calls", [])) +
+        len(events.get("transactions", [])) +
+        len(events.get("meetings", [])) +
+        len(events.get("communications", [])) +
+        len(events.get("location_presence", []))
+    )
+
+    return {
+        "status": "SUCCESS",
+        "case_id": case_id,
+        "document_id": doc_id,
+        "summary": {
+            "entities_detected": total_entities_count,
+            "events_detected": total_events_count,
+            "relationships_detected": len(relationships),
+            "possible_person_matches": len(candidate_person_matches),
+            "message": f"Text processed successfully: {total_entities_count} entities, {total_events_count} events, {len(relationships)} relationships detected."
+        },
+        "entities": entities,
+        "detailed_entities": detailed_entities,
+        "events": events,
+        "relationships": relationships,
+        "candidate_person_matches": candidate_person_matches,
+        "disclaimer": "NLP outputs are investigative leads for human review, not verified judicial facts."
+    }
 
 @router.post("/report", summary="Ingest raw investigation narrative, extract entities/events, and update graph")
 def ingest_investigation_report(
@@ -89,7 +166,7 @@ def ingest_investigation_report(
             db.add(lookup)
     db.commit()
 
-    # 4. Extract Events (CALL and TRANSACTION)
+    # 4. Extract Events (CALL, TRANSACTION, MEETING, COMMUNICATION, LOCATION_PRESENCE)
     events = extract_events_from_text(raw_text)
 
     # Store Call Records
@@ -102,7 +179,7 @@ def ingest_investigation_report(
             timestamp=c.get("timestamp", ""),
             case_id=case_id,
             source_document=doc_id,
-            confidence=c.get("confidence", "")
+            confidence=str(c.get("confidence", "extracted_from_text"))
         )
         db.add(c_rec)
 
@@ -126,8 +203,14 @@ def ingest_investigation_report(
 
     db.commit()
 
-    # 5. Extract Graph Relationships
-    relations = extract_relationships(entities, events, case_id=case_id, document_id=doc_id)
+    # 5. Extract Graph Relationships with Provenance
+    relations = extract_relationships(
+        entities=entities,
+        events=events,
+        case_id=case_id,
+        document_id=doc_id,
+        raw_text=raw_text
+    )
 
     # Transform relationships into graph ingestion format (using pseudonyms for nodes)
     graph_records = []
@@ -188,6 +271,20 @@ def ingest_investigation_report(
         )
         alerts_created.append({"id": alert.id, "alert_type": "TRANSACTION_PATTERN", "reason": alert.reason, "status": "PENDING"})
 
+    # Check Candidate Person Ambiguities
+    candidate_matches = resolve_case_identities(entities.get("PERSON", []), case_id=case_id)
+    for cm in candidate_matches:
+        if cm.get("requires_review"):
+            alert = create_alert(
+                db=db,
+                case_id=case_id,
+                alert_type="POTENTIAL_MATCH",
+                related_entities=[generate_hash_id(cm["person1"]), generate_hash_id(cm["person2"])],
+                source_module="nlp.person_matching",
+                reason=cm["recommendation"]
+            )
+            alerts_created.append({"id": alert.id, "alert_type": "POTENTIAL_MATCH", "reason": alert.reason, "status": "PENDING"})
+
     # 7. Log NLP and Graph events to Chain of Custody
     log_custody_action(
         db=db,
@@ -197,7 +294,9 @@ def ingest_investigation_report(
             "document_id": doc_id,
             "entities_found": {k: len(v) for k, v in entities.items()},
             "calls_extracted": len(events.get("calls", [])),
-            "transactions_extracted": len(events.get("transactions", []))
+            "transactions_extracted": len(events.get("transactions", [])),
+            "meetings_extracted": len(events.get("meetings", [])),
+            "relationships_extracted": len(relations)
         },
         user_id=actor_email,
         role=role,
@@ -222,10 +321,55 @@ def ingest_investigation_report(
         "case_id": case_id,
         "entities": entities,
         "events": events,
+        "relationships_count": len(relations),
         "graph_delta": graph_delta,
         "alerts_created": alerts_created,
         "disclaimer": "Extracted entities, events, and relationships are investigative leads for human review, not verified facts."
     }
+
+@router.post("/upload-report-document", summary="Upload narrative document (TXT, PDF, DOCX, JSON), extract text, and run NLP pipeline")
+async def upload_report_document(
+    file: UploadFile = File(...),
+    case_id: str = Form(...),
+    document_type: str = Form(DocumentType.FIR.value),
+    current_user: dict = Depends(require_role([UserRole.INVESTIGATOR, UserRole.ADMINISTRATOR])),
+    db: Session = Depends(get_db)
+):
+    """
+    Ingest a document file (TXT, PDF, DOCX, JSON):
+    1. Extract machine-readable text safely
+    2. Check for image-only PDF requiring OCR
+    3. Run NLP pipeline and update case records and graph
+    """
+    file_bytes = await file.read()
+    fname = file.filename or "report_document.txt"
+    case_id_clean = case_id.strip()
+
+    extraction = extract_document_text(file_bytes=file_bytes, file_name=fname)
+    extracted_text = extraction["text"]
+
+    if not extracted_text:
+        ocr_msg = extraction.get("ocr_message") or "Document contains no readable text."
+        raise HTTPException(
+            status_code=400,
+            detail=f"Could not extract machine-readable text from '{fname}'. {ocr_msg}"
+        )
+
+    doc_id = f"DOC-{uuid.uuid4().hex[:8].upper()}"
+
+    payload = ReportPayload(
+        document_id=doc_id,
+        document_type=document_type,
+        text=extracted_text,
+        case_id=case_id_clean
+    )
+    result = ingest_investigation_report(payload=payload, current_user=current_user, db=db)
+    result["file_name"] = fname
+    result["extracted_char_count"] = extraction["char_count"]
+    if extraction.get("ocr_message"):
+        result["ocr_notice"] = extraction["ocr_message"]
+
+    return result
 
 @router.post("/upload-forensic-zip", summary="Ingest digital forensic evidence ZIP archive with provenance check")
 async def upload_forensic_zip(

@@ -87,3 +87,10 @@ def admin_headers():
         "X-Role": "administrator",
         "X-User": "admin_sharma@investigation.gov.in"
     }
+
+@pytest.fixture(autouse=True)
+def mock_otp_mailer(monkeypatch):
+    def fake_send_otp_email(to, otp, expiry_minutes=10):
+        return {"delivered": True, "dev_mode": True, "preview": otp}
+    monkeypatch.setattr("app.security.mailer.send_otp_email", fake_send_otp_email)
+    monkeypatch.setattr("app.api.auth_routes.send_otp_email", fake_send_otp_email)

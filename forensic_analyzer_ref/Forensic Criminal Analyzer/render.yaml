@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: forensic-criminal-analyzer-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT wsgi:app
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: "*"

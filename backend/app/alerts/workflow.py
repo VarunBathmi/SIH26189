@@ -27,7 +27,7 @@ def create_alert(
         source_module=source_module,
         reason=reason,
         status=AlertStatus.PENDING.value,
-        detected_at=datetime.datetime.utcnow()
+        detected_at=datetime.datetime.now(datetime.timezone.utc)
     )
 
     db.add(alert)
@@ -51,7 +51,7 @@ def confirm_alert(
 
     alert.status = AlertStatus.CONFIRMED.value
     alert.reviewed_by = reviewer_id
-    alert.reviewed_at = datetime.datetime.utcnow()
+    alert.reviewed_at = datetime.datetime.now(datetime.timezone.utc)
     alert.review_notes = notes or "Confirmed by investigator"
 
     db.commit()
@@ -101,7 +101,7 @@ def dismiss_alert(
 
     alert.status = AlertStatus.DISMISSED.value
     alert.reviewed_by = reviewer_id
-    alert.reviewed_at = datetime.datetime.utcnow()
+    alert.reviewed_at = datetime.datetime.now(datetime.timezone.utc)
     alert.review_notes = notes or "Dismissed by investigator (false positive)"
 
     db.commit()

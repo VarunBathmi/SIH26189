@@ -60,7 +60,7 @@ def log_custody_action(
     """
     try:
         prev_hash = get_latest_case_hash(db, case_id)
-        now_dt = datetime.datetime.utcnow()
+        now_dt = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         timestamp_iso = now_dt.isoformat()
 
         # Canonicalize details for JSON storage
@@ -134,7 +134,12 @@ def verify_custody_chain(db: Session, case_id: str) -> Dict[str, Any]:
             })
 
         # 2. Re-compute hash from immutable stored fields
-        timestamp_iso = rec.created_at.isoformat()
+        dt_val = rec.created_at
+        if hasattr(dt_val, "replace"):
+            timestamp_iso = dt_val.replace(tzinfo=None).isoformat()
+        else:
+            timestamp_iso = str(dt_val)
+
         recalculated_hash = compute_custody_hash(
             case_id=rec.case_id,
             action=rec.action,

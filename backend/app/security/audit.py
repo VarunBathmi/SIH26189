@@ -21,7 +21,7 @@ def log_audit_event(
     """
     try:
         event = AuditLog(
-            timestamp=datetime.datetime.utcnow(),
+            timestamp=datetime.datetime.now(datetime.timezone.utc),
             user_id=str(user_id) if user_id else "SYSTEM",
             role=str(role) if role else "SYSTEM",
             action=action,

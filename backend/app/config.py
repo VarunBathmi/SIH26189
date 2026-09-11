@@ -16,12 +16,12 @@ class Settings(BaseSettings):
     VERSION: str = "4.0.0"
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     
-    # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev_secret_key_change_in_production_1234567890abcdef")
+    # Security (Shared with Auth Microservice)
+    SECRET_KEY: str = os.getenv("JWT_SECRET", os.getenv("SECRET_KEY", "sih_master_secret_key_jwt_2026_investigation_platform_secure"))
     FERNET_KEY: str = os.getenv("FERNET_KEY", "jdVLIGwIosNtWQubOxj2ZznPQdOVf89Q0t-K729uNb0=")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12 # 12 hours
-    OTP_EXPIRE_MINUTES: int = 10
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")) # 1 hour default
+    OTP_EXPIRE_MINUTES: int = int(os.getenv("OTP_EXPIRY_MINUTES", "10"))
     
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://sih_user:sih_pass@localhost:5432/crime_network_db")
@@ -52,9 +52,10 @@ class Settings(BaseSettings):
             if origin.strip()
         ]
 
-    class Config:
-        case_sensitive = True
-        extra = "allow"
+    model_config = {
+        "case_sensitive": True,
+        "extra": "allow"
+    }
 
 settings = Settings()
 

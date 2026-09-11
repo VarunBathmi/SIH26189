@@ -28,8 +28,8 @@ def create_case(
         description=description,
         status=CaseStatus.OPEN.value,
         created_by=created_by,
-        created_at=datetime.datetime.utcnow(),
-        updated_at=datetime.datetime.utcnow()
+        created_at=datetime.datetime.now(datetime.timezone.utc),
+        updated_at=datetime.datetime.now(datetime.timezone.utc)
     )
 
     db.add(case)
@@ -109,7 +109,7 @@ def update_case_status(
 
     old_status = case.status
     case.status = status_upper
-    case.updated_at = datetime.datetime.utcnow()
+    case.updated_at = datetime.datetime.now(datetime.timezone.utc)
     db.commit()
     db.refresh(case)
 

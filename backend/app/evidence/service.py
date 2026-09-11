@@ -63,7 +63,7 @@ def register_evidence(
     blocks = format_hash_blocks(sha_hash)
     symbols = generate_visual_symbols(sha_hash)
 
-    now_dt = datetime.datetime.utcnow()
+    now_dt = datetime.datetime.now(datetime.timezone.utc)
 
     record = EvidenceRecord(
         evidence_id=evidence_id,
@@ -187,5 +187,5 @@ def verify_evidence_integrity(
         "match": is_valid,
         "visual_blocks": format_hash_blocks(current_hash),
         "visual_symbols": generate_visual_symbols(current_hash),
-        "verified_at": datetime.datetime.utcnow().isoformat()
+        "verified_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }

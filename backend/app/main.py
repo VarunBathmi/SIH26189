@@ -68,6 +68,8 @@ app.add_middleware(
 
 # Healthcheck endpoint (Public)
 @app.get("/health", tags=["Health & Diagnostics"], summary="Comprehensive DB & Graph Health Check")
+@app.get("/api/health", tags=["Health & Diagnostics"], summary="Comprehensive DB & Graph Health Check (API alias)")
+@app.get("/api/v1/health", tags=["Health & Diagnostics"], summary="Comprehensive DB & Graph Health Check (API v1 alias)")
 def health_check(db: Session = Depends(get_db)):
     db_status = "connected"
     try:

@@ -74,25 +74,34 @@ docker compose up -d --build
 docker compose ps
 ```
 
-### Option 2: Run Locally (Python 3.12)
+### Option 3: Run Hardened Email-OTP MFA Auth Microservice (Node.js)
 ```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+# 1. Navigate to auth service
+cd auth
 
-# 2. Seed realistic demo investigation data
-python scripts/seed_demo_data.py
+# 2. Install dependencies
+npm install
 
-# 3. Start FastAPI ASGI dev server
-uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+# 3. Run test suite (10 comprehensive MFA & RBAC tests)
+npm test
+
+# 4. Start Auth service on port 5001 (or custom PORT)
+npm start
 ```
+
+For complete authentication flow diagrams, environment variables, API schemas, and RBAC mapping, see [AUTH_README.md](file:///d:/SIH26189/AUTH_README.md).
 
 ---
 
 ## 🧪 Running Automated Tests
 
-Run the complete test suite (21 unit and integration tests):
+Run the complete test suite (both Python backend and Node.js auth service):
 ```bash
+# Python Backend Test Suite (43 tests covering NLP, Neo4j, Forensics, Custody)
 pytest -v
+
+# Node.js MFA Auth Test Suite (10 tests covering OTP, JWT, Lockout, Rate Limiting)
+cd auth && npm test
 ```
 
 Test coverage includes:
